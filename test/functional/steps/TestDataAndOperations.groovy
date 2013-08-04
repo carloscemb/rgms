@@ -730,6 +730,17 @@ class TestDataAndOperations {
         visitController.update()
     }
 
+    /**
+     * @author carloscemb
+     */
+    static public Visit searchVisit(String name, String initialDate, String finalDate) {
+        def visitor = Visitor.findByName(name)
+        Date day_1 = Date.parse("dd/MM/yyyy", initialDate)
+        Date day_2 = Date.parse("dd/MM/yyyy", finalDate)
+        def visit = Visit.findByVisitorAndDataInicioAndDataFim(visitor, day_1, day_2)
+        return visit
+    }
+
 //#end
 
     static public ResearchGroup createAndGetResearchGroupByName(String name) {
