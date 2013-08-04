@@ -688,7 +688,10 @@ class TestDataAndOperations {
      */
     static public void removeVisit(String name, String initialDate, String finalDate) {
         def visitController = new VisitController()
-        def visit = searchVisit(name, initialDate, finalDate)
+        def visitor = Visitor.findByName(name)
+        Date dia_1 = Date.parse("dd/MM/yyyy", initialDate)
+        Date dia_2 = Date.parse("dd/MM/yyyy", finalDate)
+        def visit = Visit.findByVisitorAndDataInicioAndDataFim(visitor, dia_1, dia_2)
         visitController.params << [id: visit.id]
         visitController.delete()
     }
@@ -696,8 +699,11 @@ class TestDataAndOperations {
     /**
      * @author carloscemb
      */
-    static public def editVisit(String oldVisitante, String oldDataInicio, String oldDataFim, String newVisitante) {
-        def visit = searchVisit(oldVisitante, oldDataInicio, oldDataFim)
+    static public Visit editVisit(String oldVisitante, String oldDataInicio, String oldDataFim, String newVisitante) {
+        def visitor = Visitor.findByName(oldVisitante)
+        Date dia_1 = Date.parse("dd/MM/yyyy", oldDataInicio)
+        Date dia_2 = Date.parse("dd/MM/yyyy", oldDataFim)
+        def visit = Visit.findByVisitorAndDataInicioAndDataFim(visitor, dia_1, dia_2)
 
         def novoVisitor = Visitor.findByName(newVisitante)
 
@@ -708,42 +714,29 @@ class TestDataAndOperations {
 
         visit.setVisitor(novoVisitor)
 
-        updateVisit(visit)
+        def visitController = new VisitController()
+        visitController.params << visit.properties
+        visitController.update()
 
-        def updatedVisit = searchVisit(newVisitante, oldDataInicio, oldDataFim)
+        def updatedVisit = Visit.findByVisitorAndDataInicioAndDataFim(novoVisitor, dia_1, dia_2)
         return updatedVisit
     }
 
     /**
      * @author penc
      */
-    static public def editVisitChangeData(String visitante, String dataInicio, String oldDataFim, String newDataFim) {
-        def visit = searchVisit(visitante, dataInicio, oldDataFim)
+    static public Visit editVisitChangeData(String visitante, String dataInicio, String oldDataFim, String newDataFim) {
+        def visitor = Visitor.findByName(visitante)
+        Date dia_1 = Date.parse("dd/MM/yyyy", dataInicio)
+        Date dia_2 = Date.parse("dd/MM/yyyy", oldDataFim)
+        def visit = Visit.findByVisitorAndDataInicioAndDataFim(visitor, dia_1, dia_2)
 
         Date newFinalDate = Date.parse("dd/MM/yyyy", newDataFim)
         visit.setDataFim(newFinalDate);
 
-        updateVisit(visit)
-    }
-
-    /**
-     * @author carloscemb
-     */
-    static public def updateVisit(Visit visit) {
         def visitController = new VisitController()
         visitController.params << visit.properties
         visitController.update()
-    }
-
-    /**
-     * @author carloscemb
-     */
-    static public Visit searchVisit(String name, String initialDate, String finalDate) {
-        def visitor = Visitor.findByName(name)
-        Date day_1 = Date.parse("dd/MM/yyyy", initialDate)
-        Date day_2 = Date.parse("dd/MM/yyyy", finalDate)
-        def visit = Visit.findByVisitorAndDataInicioAndDataFim(visitor, day_1, day_2)
-        return visit
     }
 
 //#end
